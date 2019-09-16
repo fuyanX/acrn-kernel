@@ -52,6 +52,7 @@ void populate_pvinfo_page(struct intel_vgpu *vgpu)
 	vgpu_vreg_t(vgpu, vgtif_reg(vgt_caps)) = VGT_CAPS_FULL_48BIT_PPGTT;
 	vgpu_vreg_t(vgpu, vgtif_reg(vgt_caps)) |= VGT_CAPS_HWSP_EMULATION;
 	vgpu_vreg_t(vgpu, vgtif_reg(vgt_caps)) |= VGT_CAPS_HUGE_GTT;
+	vgpu_vreg_t(vgpu, vgtif_reg(vgt_caps)) |= VGT_CAPS_GOP_SUPPORT;
 
 	vgpu_vreg_t(vgpu, vgtif_reg(avail_rs.mappable_gmadr.base)) =
 		vgpu_aperture_gmadr_base(vgpu);
@@ -76,6 +77,13 @@ void populate_pvinfo_page(struct intel_vgpu *vgpu)
 					1 << (pipe * SKL_NUM_SCALERS + scaler);
 
 	vgpu_vreg_t(vgpu, vgtif_reg(enable_pvmmio)) = 0;
+
+	vgpu_vreg_t(vgpu, vgtif_reg(gop.fb_base)) = 0;
+	vgpu_vreg_t(vgpu, vgtif_reg(gop.width)) = 0;
+	vgpu_vreg_t(vgpu, vgtif_reg(gop.height)) = 0;
+	vgpu_vreg_t(vgpu, vgtif_reg(gop.pitch)) = 0;
+	vgpu_vreg_t(vgpu, vgtif_reg(gop.Bpp)) = 0;
+	vgpu_vreg_t(vgpu, vgtif_reg(gop.size)) = 0;
 
 	gvt_dbg_core("Populate PVINFO PAGE for vGPU %d\n", vgpu->id);
 	gvt_dbg_core("aperture base [GMADR] 0x%llx size 0x%llx\n",
