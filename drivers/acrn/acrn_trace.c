@@ -185,7 +185,7 @@ static int __init acrn_trace_init(void)
 		return -EINVAL;
 	}
 
-	ret = hcall_get_hw_info(virt_to_phys(&hw_info));
+	ret = hcall_get_hw_info(slow_virt_to_phys(&hw_info));
 	if (!ret)
 		pcpu_num = hw_info.cpu_num;
 
@@ -206,7 +206,7 @@ static int __init acrn_trace_init(void)
 
 	foreach_cpu(cpu, pcpu_num) {
 		sbuf = acrn_trace_devs[cpu].sbuf;
-		BUG_ON(!virt_addr_valid(sbuf));
+		WARN_ON(!virt_addr_valid(sbuf));
 		ret = sbuf_share_setup(cpu, ACRN_TRACE, virt_to_phys(sbuf));
 		if (ret < 0) {
 			pr_err("Failed to setup SBuf, cpuid %d\n", cpu);

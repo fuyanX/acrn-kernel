@@ -124,7 +124,6 @@ VOID UTILITY_Read_Cpuid(U64 cpuid_function, U64 *rax_value,
 			pcpuid.subleaf = (U32)*rcx_value;
 		}
 
-		/* workaround. disalbe the check. */
 		//BUG_ON(!virt_addr_valid(&pcpuid));
 
 		if (acrn_hypercall2(HC_PROFILING_OPS, PROFILING_GET_PCPUID,

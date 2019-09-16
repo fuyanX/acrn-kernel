@@ -367,13 +367,14 @@ static int __init acrn_hvlog_init(void)
 		return 0;
 	}
 
-	hvlog_buf_virtaddr_base = ioremap(hvlog_buf_phyaddr_base, hvlog_buf_size);
-	if(!hvlog_buf_virtaddr_base) {
+	hvlog_buf_virtaddr_base = ioremap(hvlog_buf_phyaddr_base,
+					  hvlog_buf_size);
+	if (!hvlog_buf_virtaddr_base) {
 		pr_info("%s: Error ioremap hvlog memblock.\n", __func__);
 		return 0;
 	}
 
-	ret = hcall_get_hw_info(virt_to_phys(&hw_info));
+	ret = hcall_get_hw_info(slow_virt_to_phys(&hw_info));
 	if (!ret)
 		pcpu_nr = hw_info.cpu_num;
 

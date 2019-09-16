@@ -33,8 +33,6 @@
 #include <linux/freezer.h>
 #include <linux/wait.h>
 #include <linux/sched.h>
-#include <linux/hrtimer.h>
-#include <uapi/linux/sched/types.h>
 
 #include <linux/vhm/acrn_hv_defs.h>
 #include <linux/vhm/acrn_common.h>
@@ -58,7 +56,6 @@ do {    if (x) break;                                                       \
                 __FILE__, __func__, __LINE__, #x); dump_stack(); BUG();     \
 } while (0)
 
-#define ACRNGT_TIMER_ISR	1
 
 struct kobject *acrn_gvt_ctrl_kobj;
 static struct kset *acrn_gvt_kset;
@@ -67,6 +64,7 @@ static DEFINE_MUTEX(acrn_gvt_sysfs_lock);
 struct gvt_acrngt acrngt_priv;
 const struct intel_gvt_ops *intel_gvt_ops;
 
+<<<<<<< HEAD
 static ssize_t acrngt_sysfs_instance_manage(struct kobject *kobj,
 	struct kobj_attribute *attr, const char *buf, size_t count);
 static ssize_t acrngt_sysfs_vgpu_id(struct kobject *kobj,
@@ -133,15 +131,8 @@ void acrngt_instance_destroy(struct intel_vgpu *vgpu)
 	if (vgpu) {
 		info = (struct acrngt_hvm_dev *)vgpu->handle;
 
-		mutex_lock(&gvt->lock);
-		vgpu->vgpu_priv = NULL;
-		mutex_unlock(&gvt->lock);
-		if (info && info->emulation_thread != NULL) {
+		if (info && info->emulation_thread != NULL)
 			kthread_stop(info->emulation_thread);
-			info->emulation_thread = NULL;
-		}
-		if (info && info->timer_thread != NULL)
-			kthread_stop(info->timer_thread);
 
                 for_each_pipe(gvt->dev_priv, pipe) {
                         for_each_universal_plane(gvt->dev_priv, pipe, plane) {
@@ -152,15 +143,13 @@ void acrngt_instance_destroy(struct intel_vgpu *vgpu)
                         }
                 }
 
-		intel_gvt_ops->vgpu_deactivate(vgpu);
+		intel_gvt_ops->vgpu_release(vgpu);
 		intel_gvt_ops->vgpu_destroy(vgpu);
 	}
 
 	if (info) {
 		gvt_dbg_core("destroy vgpu instance, vm id: %d, client %d",
 				info->vm_id, info->client);
-
-		hrtimer_cancel(&info->thread_timer);
 
 		if (info->client != 0)
 			acrn_ioreq_destroy_client(info->client);
@@ -293,7 +282,6 @@ static int acrngt_emulation_thread(void *priv)
 
 	gvt_dbg_core("start kthread for VM%d\n", info->vm_id);
 	ASSERT(info->nr_vcpu <= MAX_HVM_VCPUS_SUPPORTED);
-	set_user_nice(current, -10);
 
 	set_freezable();
 	while (1) {
@@ -419,13 +407,6 @@ struct intel_vgpu *acrngt_instance_create(domid_t vm_id,
 		goto err;
 	}
 	info->emulation_thread = thread;
-	hrtimer_init(&info->thread_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-	info->thread_timer.function = acrn_thread_timer;
-	vgpu->vgpu_priv = info;
-
-	init_waitqueue_head(&info->timer_thread_wq);
-	info->timer_thread = kthread_run(acrngt_emulation_timer_thread, info,
-				"acrngt_work:%d", vm_id);
 	gvt_dbg_core("create vgpu instance success, vm_id %d, client %d,"
 		" nr_vcpu %d\n", info->vm_id,info->client, info->nr_vcpu);
 

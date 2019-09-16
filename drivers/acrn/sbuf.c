@@ -179,8 +179,9 @@ int sbuf_share_setup(uint32_t pcpu_id, uint32_t sbuf_id, uint64_t gpa)
 	ssp = acrn_mempool_alloc(GFP_KERNEL);
 	ssp->pcpu_id = pcpu_id;
 	ssp->sbuf_id = sbuf_id;
+
 	ssp->gpa = gpa;
-	pr_info("setup phys add = 0x%llx\n", ssp->gpa);
+	pr_info("setup phys add = 0x%llx\n", gpa);
 
 	ret = hcall_setup_sbuf(virt_to_phys(ssp));
 	acrn_mempool_free(ssp);

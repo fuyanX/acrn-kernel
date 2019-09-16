@@ -134,7 +134,7 @@ int vhm_inject_msi(unsigned long vmid, unsigned long msi_addr,
 	 * and the interrupt is disabled.
 	 * So the GFP_ATOMIC should be used instead of GFP_KERNEL to
 	 * avoid the sleeping with interrupt disabled.
-	 */ 
+	 */
 	msi = acrn_mempool_alloc(GFP_ATOMIC);
 	/* msi_addr: addr[19:12] with dest vcpu id */
 	/* msi_data: data[7:0] with vector */

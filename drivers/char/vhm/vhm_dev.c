@@ -617,7 +617,7 @@ create_vm_fail:
 			}
 
 			if (copy_to_user((void *)ioctl_param,
-					pm_info, sizeof(*pm_info)))
+					pm_info, sizeof(pm_info)))
 					ret = -EFAULT;
 			acrn_mempool_free(pm_info);
 			break;
@@ -699,7 +699,7 @@ create_vm_fail:
 
 	default:
 		pr_warn("Unknown IOCTL 0x%x\n", ioctl_num);
-		ret = 0;
+		ret = -EINVAL;
 		break;
 	}
 
