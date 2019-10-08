@@ -1165,7 +1165,6 @@ static int vhm_ioclient_range_show(struct seq_file *s, void *data)
 		put_vm(vm);
 	}
 	read_unlock_bh(&vhm_vm_list_lock);
->>>>>>> upstream/master
 
 	return 0;
 }
